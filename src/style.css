@@ -78,11 +78,17 @@ a {
   transition: color 0.2s, background 0.2s;
 }
 
-a.icon:hover,
 a.icon:focus-visible {
   color: var(--text);
   background: var(--hover);
   outline: none;
+}
+
+@media (hover: hover) {
+  a.icon:hover {
+    color: var(--text);
+    background: var(--hover);
+  }
 }
 
 .slot {
@@ -149,9 +155,11 @@ a.icon:focus-visible {
   scale: 1;
 }
 
-.slot:hover .plus::before,
-.slot:hover .plus::after {
-  background: var(--muted);
+@media (hover: hover) {
+  .slot:hover .plus::before,
+  .slot:hover .plus::after {
+    background: var(--muted);
+  }
 }
 
 .hint {
@@ -260,10 +268,15 @@ h2 {
   pointer-events: auto;
 }
 
-.done:hover,
 .done:focus-visible {
   background: var(--hover);
   outline: none;
+}
+
+@media (hover: hover) {
+  .done:hover {
+    background: var(--hover);
+  }
 }
 
 .small .done {
@@ -281,9 +294,14 @@ h2 {
   color: var(--faint);
 }
 
-.is-done .done:hover,
 .is-done .done:focus-visible {
   color: var(--muted);
+}
+
+@media (hover: hover) {
+  .is-done .done:hover {
+    color: var(--muted);
+  }
 }
 
 .cheer {
@@ -327,8 +345,10 @@ h2 {
   color: var(--muted);
 }
 
-.to-today:hover {
-  color: var(--text);
+@media (hover: hover) {
+  .to-today:hover {
+    color: var(--text);
+  }
 }
 
 .days {
@@ -345,10 +365,15 @@ h2 {
   transition: background 0.15s;
 }
 
-.days a:hover,
 .days a:focus-visible {
   background: var(--card);
   outline: none;
+}
+
+@media (hover: hover) {
+  .days a:hover {
+    background: var(--card);
+  }
 }
 
 .days h3 {
