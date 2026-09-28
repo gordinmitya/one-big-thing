@@ -12,7 +12,10 @@ function Summary(day: Day) {
 }
 
 async function forceUpdate() {
-  await caches?.delete("obt").catch(() => {});
+  await caches
+    ?.keys()
+    .then((keys) => Promise.all(keys.map((k) => caches.delete(k))))
+    .catch(() => {});
   await navigator.serviceWorker?.getRegistration().then((r) => r?.update()).catch(() => {});
   location.reload();
 }
