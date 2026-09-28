@@ -9,8 +9,28 @@
   --faint: #c3c9d0;
   --accent: #3f8fdc;
   --ink: #16181b;
+  --on-ink: #fff;
+  --shadow: 0 1px 2px rgb(20 30 40 / 6%), 0 4px 16px rgb(20 30 40 / 5%);
   --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141619;
+    --card: #1e2125;
+    --line: #2c3036;
+    --hover: #2a2e33;
+    --text: #e4e7ea;
+    --soft: #b2b8c0;
+    --muted: #7f8790;
+    --faint: #4b5159;
+    --accent: #5ea4e8;
+    --ink: #e4e7ea;
+    --on-ink: #141619;
+    --shadow: 0 1px 2px rgb(0 0 0 / 30%);
+    color-scheme: dark;
+  }
 }
 
 * {
@@ -184,7 +204,7 @@ a.icon:focus-visible {
   margin-top: 16px;
   background: var(--card);
   border-radius: 4px;
-  box-shadow: 0 1px 2px rgb(20 30 40 / 6%), 0 4px 16px rgb(20 30 40 / 5%);
+  box-shadow: var(--shadow);
   overflow: hidden;
 }
 
@@ -328,7 +348,7 @@ a.icon:focus-visible {
   translate: -50% -50%;
   border-radius: 50%;
   background: var(--ink);
-  color: #fff;
+  color: var(--on-ink);
   font-size: min(44px, 11.5vw);
   font-weight: 700;
   pointer-events: none;
