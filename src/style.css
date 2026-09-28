@@ -218,19 +218,11 @@ a.icon:focus-visible {
   line-height: 1.35;
 }
 
-h2 {
-  margin: 28px 0 0;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--line);
-  text-align: center;
-  font-size: 14px;
-  font-weight: 400;
-}
-
 .smalls {
   list-style: none;
-  margin: 0;
+  margin: 28px 0 0;
   padding: 0;
+  border-top: 1px solid var(--line);
 }
 
 .small {
@@ -239,9 +231,31 @@ h2 {
 }
 
 .small .field {
+  display: block;
   padding: 14px 72px;
   font-size: 16px;
   font-weight: 300;
+  line-height: 1.35;
+}
+
+.small .plus {
+  left: calc(50% - 32px);
+}
+
+.small .hint {
+  top: 50%;
+  bottom: auto;
+  left: calc(50% - 14px);
+  translate: 0 -50%;
+  text-align: left;
+}
+
+.small:not(:only-child) .plus {
+  left: 50%;
+}
+
+.small:not(:only-child) .hint {
+  opacity: 0;
 }
 
 .done {

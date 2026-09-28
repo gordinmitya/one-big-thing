@@ -1,4 +1,4 @@
-import { h } from "../dom";
+import { autoFit, fit, h } from "../dom";
 import { type Item, emptyItem } from "../model";
 import { DoneButton } from "./done";
 
@@ -14,9 +14,16 @@ export function SmallList({ items, onChange, onNavigate }: Props) {
   const emit = () => onChange([...list.children].map((li) => rows.get(li)!).filter((i) => i.text.trim()));
 
   const addRow = (item: Item, animate: boolean) => {
-    const field = h("input", { class: "field", placeholder: " ", spellcheck: "false", "aria-label": "Small thing" });
+    const field = h("textarea", { class: "field", rows: "1", placeholder: " ", spellcheck: "false", "aria-label": "Maybe do" });
     field.value = item.text;
-    const li = h("li", { class: animate ? "slot small new" : "slot small" }, field, h("span", { class: "plus", "aria-hidden": "true" }));
+    autoFit(field);
+    const li = h(
+      "li",
+      { class: animate ? "slot small new" : "slot small" },
+      field,
+      h("span", { class: "plus", "aria-hidden": "true" }),
+      h("span", { class: "hint", "aria-hidden": "true" }, "Maybe do"),
+    );
     li.append(DoneButton({ item, slot: li, field, onChange: emit }));
     rows.set(li, item);
 
@@ -28,15 +35,16 @@ export function SmallList({ items, onChange, onNavigate }: Props) {
     };
 
     field.addEventListener("input", () => {
+      fit(field);
       item.text = field.value;
       if (isLast() && field.value) addRow(emptyItem(), true);
       emit();
     });
     field.addEventListener("keydown", (e) => {
       if (e.isComposing) return;
-      if (e.key === "Enter" && field.value.trim()) {
+      if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
-        onNavigate(field, 1);
+        if (field.value.trim()) onNavigate(field, 1);
       } else if (e.key === "Backspace" && !field.value && !isLast()) {
         e.preventDefault();
         onNavigate(field, -1);

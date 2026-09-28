@@ -38,7 +38,6 @@ export function DayView({ date, when, day, onChange }: Props) {
         ...day.medium.map((item) => Slot({ kind: "medium", hint: "Medium thing", item, onChange: save, onEnter: next })),
       ),
     ),
-    h("h2", {}, "Other things I might do"),
     SmallList({
       items: day.small,
       onChange: (small) => {
