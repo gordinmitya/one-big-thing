@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { emptyDay } from "./model";
-import { parseDay, parseDays, pastDays, saveDay } from "./storage";
+import { parseDay, parseDays, pastDays, prune, saveDay } from "./storage";
 
 test("reads the v1 format", () => {
   const raw = JSON.stringify({
@@ -44,4 +44,10 @@ test("is lenient with garbage", () => {
 test("pastDays leaves out today and tomorrow", () => {
   for (const date of ["2026-09-27", "2026-09-28", "2026-09-29"]) saveDay(date, { ...emptyDay(), big: { text: date, done: false } });
   expect(pastDays("2026-09-28").map(([d]) => d)).toEqual(["2026-09-27"]);
+});
+
+test("prune drops days older than two weeks", () => {
+  for (const date of ["2026-09-13", "2026-09-14", "2026-09-27"]) saveDay(date, { ...emptyDay(), big: { text: date, done: false } });
+  prune("2026-09-28");
+  expect(pastDays("2026-09-28").map(([d]) => d)).toEqual(["2026-09-27", "2026-09-14"]);
 });

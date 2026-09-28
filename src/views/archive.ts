@@ -29,5 +29,6 @@ export function ArchiveView({ days }: { days: [string, Day][] }) {
           ),
         )
       : h("p", { class: "empty" }, "Nothing here yet. Past days will show up here."),
+    h("p", { class: "note" }, "Days older than two weeks are deleted."),
   );
 }

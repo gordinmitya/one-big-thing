@@ -39,6 +39,7 @@ function view(route: Route): HTMLElement {
 
 function render(transition: Transition = "fade") {
   today = localDate();
+  storage.prune(today);
   const page = view(parseRoute(location.hash));
   page.classList.add(transition);
   app.replaceChildren(page);

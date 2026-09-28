@@ -1,5 +1,6 @@
-import { type Day, type Item, emptyDay, isEmpty } from "./model";
+import { addDays, type Day, type Item, emptyDay, isEmpty } from "./model";
 
+export const KEEP_DAYS = 14;
 export const DAYS_KEY = "obt.days.v1";
 export const LAST_SEEN_KEY = "obt.lastSeen";
 
@@ -56,6 +57,14 @@ export function getDay(date: string): Day {
 export function saveDay(date: string, day: Day) {
   if (isEmpty(day)) delete days[date];
   else days[date] = structuredClone({ ...day, small: day.small.filter((i) => i.text.trim()) });
+  write(DAYS_KEY, JSON.stringify(days));
+}
+
+export function prune(today: string) {
+  const cutoff = addDays(today, -KEEP_DAYS);
+  const old = Object.keys(days).filter((d) => d < cutoff);
+  if (!old.length) return;
+  for (const d of old) delete days[d];
   write(DAYS_KEY, JSON.stringify(days));
 }
 
