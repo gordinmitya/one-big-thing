@@ -68,3 +68,8 @@ window.addEventListener("resize", () => app.querySelectorAll("textarea").forEach
 const lastSeen = storage.getLastSeen();
 render(lastSeen && lastSeen !== today ? "wipe" : "fade");
 scheduleMidnight();
+
+if (import.meta.env.PROD && "serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./sw.js").catch(() => {});
+  navigator.storage?.persist?.().catch(() => {});
+}
