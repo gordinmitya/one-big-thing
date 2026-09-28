@@ -11,7 +11,25 @@ Fully local: no backend, no accounts. Data is stored in your browser's `localSto
 bun install
 bun run dev      # http://localhost:5173
 bun run build    # outputs to dist/
+bun test         # storage contract tests
 ```
+
+## Layout
+
+```
+src/
+  model.ts        types + pure helpers (no DOM, no storage)
+  storage.ts      localStorage read/write — implements STORAGE.md
+  dom.ts          h() hyperscript + tiny DOM utils
+  components/     (props) => HTMLElement building blocks
+  views/          full screens: day, archive
+  main.ts         routing, new-day rollover, wires storage into views
+```
+
+Data flows one way: `main` loads a `Day` from storage, hands it to a view, and the view
+calls `onChange(day)`; `main` saves it. Views and components never touch storage.
+
+The on-disk format is a stable contract: see [STORAGE.md](STORAGE.md).
 
 ## Deploy
 
