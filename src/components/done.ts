@@ -30,7 +30,7 @@ export function DoneButton({ item, slot, field, onChange }: Props) {
     e.preventDefault();
     item.done = !item.done;
     sync();
-    if (item.done) cheer(btn);
+    if (item.done) cheer(field);
     onChange();
   });
   sync();
