@@ -1,0 +1,348 @@
+:root {
+  --bg: #000;
+  --card: #111;
+  --line: #262626;
+  --text: #f2f2f2;
+  --muted: #6b6b6b;
+  --faint: #3a3a3a;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.page {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: max(8px, env(safe-area-inset-top)) 16px 64px;
+}
+
+/* ---------- Header ---------- */
+
+.top {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.title {
+  text-align: center;
+}
+
+.title h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.title small {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: var(--muted);
+  transition: color 0.2s, background 0.2s;
+}
+
+a.icon:hover,
+a.icon:focus-visible {
+  color: var(--text);
+  background: #1a1a1a;
+  outline: none;
+}
+
+/* ---------- Slots (shared) ---------- */
+
+.slot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: text;
+}
+
+.field {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: center;
+  resize: none;
+  overflow: hidden;
+  caret-color: var(--text);
+}
+
+/* Thin "+" drawn with two lines, visible while the slot is empty and not focused. */
+.plus {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--plus, 36px);
+  height: var(--plus, 36px);
+  translate: -50% -50%;
+  pointer-events: none;
+  opacity: 0;
+  scale: 0.6;
+  transition: opacity 0.2s, scale 0.25s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.plus::before,
+.plus::after {
+  content: "";
+  position: absolute;
+  background: var(--faint);
+}
+
+.plus::before {
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.plus::after {
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
+.slot:has(.field:placeholder-shown:not(:focus)) .plus {
+  opacity: 1;
+  scale: 1;
+}
+
+.slot:hover .plus::before,
+.slot:hover .plus::after {
+  background: var(--muted);
+}
+
+.hint {
+  position: absolute;
+  bottom: 14px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--faint);
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.slot:not(:has(.field:placeholder-shown)) .hint {
+  opacity: 0;
+}
+
+/* ---------- Card: 1 big + 3 medium ---------- */
+
+.card {
+  margin-top: 16px;
+  background: var(--card);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.big {
+  --plus: 56px;
+  min-height: 220px;
+  padding: 28px 24px 40px;
+  border-bottom: 2px dotted var(--line);
+}
+
+.big .field {
+  font-size: clamp(26px, 7vw, 36px);
+  font-weight: 300;
+  line-height: 1.2;
+}
+
+.mediums {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.medium {
+  --plus: 28px;
+  min-height: 150px;
+  padding: 20px 10px 36px;
+}
+
+.medium .field {
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.35;
+}
+
+/* ---------- Small things ---------- */
+
+h2 {
+  margin: 28px 0 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.smalls {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.small {
+  --plus: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.small .field {
+  padding: 14px 4px;
+  font-size: 16px;
+  font-weight: 300;
+}
+
+.small.new {
+  animation: rise 0.25s ease-out;
+}
+
+.to-today {
+  display: block;
+  margin-top: 32px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.to-today:hover {
+  color: var(--text);
+}
+
+/* ---------- Archive ---------- */
+
+.days {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.days a {
+  display: block;
+  padding: 16px 8px;
+  border-bottom: 1px solid var(--line);
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.days a:hover,
+.days a:focus-visible {
+  background: var(--card);
+  outline: none;
+}
+
+.days h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.days h3 small {
+  margin-left: 8px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.days p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.45;
+  color: #bdbdbd;
+}
+
+.empty {
+  margin-top: 48px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* ---------- Transitions ---------- */
+
+.fade {
+  animation: fade 0.3s ease-out;
+}
+
+/* New day: the fresh page wipes in from the left, like turning a sticky note. */
+.wipe {
+  animation: wipe 0.9s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+
+@keyframes wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0.4;
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 -6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
