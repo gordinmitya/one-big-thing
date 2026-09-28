@@ -60,7 +60,21 @@ function scheduleMidnight() {
   }, next.getTime() - now.getTime());
 }
 
-window.addEventListener("hashchange", () => render());
+const sameRoute = (a: string, b: string) => JSON.stringify(parseRoute(a)) === JSON.stringify(parseRoute(b));
+const stack = [location.hash];
+
+window.addEventListener("hashchange", () => {
+  if (stack.length > 1 && sameRoute(location.hash, stack[stack.length - 2])) stack.pop();
+  else stack.push(location.hash);
+  render();
+});
+
+document.addEventListener("click", (e) => {
+  const link = (e.target as Element).closest?.<HTMLAnchorElement>('a[href^="#"]');
+  if (!link || stack.length < 2 || !sameRoute(link.hash || "#/", stack[stack.length - 2])) return;
+  e.preventDefault();
+  history.back();
+});
 window.addEventListener("focus", checkNewDay);
 document.addEventListener("visibilitychange", () => document.visibilityState === "visible" && checkNewDay());
 
