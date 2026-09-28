@@ -1,17 +1,17 @@
-import { Header, ICON_ARCHIVE, ICON_BACK } from "../components/header";
+import { Header, ICON_ARCHIVE, ICON_BACK, ICON_FORWARD } from "../components/header";
 import { Slot } from "../components/slot";
 import { SmallList } from "../components/small-list";
 import { focusSibling, h } from "../dom";
-import { type Day, weekday } from "../model";
+import { addDays, type Day, weekday } from "../model";
 
 type Props = {
   date: string;
-  isToday: boolean;
+  when: "past" | "today" | "tomorrow";
   day: Day;
   onChange: (day: Day) => void;
 };
 
-export function DayView({ date, isToday, day, onChange }: Props) {
+export function DayView({ date, when, day, onChange }: Props) {
   const save = () => onChange(day);
   const page = h("main", { class: "page" });
   const next = (from: HTMLElement, delta = 1) => focusSibling(page, from, delta);
@@ -19,10 +19,14 @@ export function DayView({ date, isToday, day, onChange }: Props) {
   page.append(
     Header({
       title: date,
-      subtitle: isToday ? `${weekday(date)} · today` : weekday(date),
-      left: isToday
-        ? { href: "#/archive", label: "Archive", icon: ICON_ARCHIVE }
-        : { href: "#/archive", label: "Back to archive", icon: ICON_BACK },
+      subtitle: when === "past" ? weekday(date) : `${weekday(date)} · ${when}`,
+      left:
+        when === "today"
+          ? { href: "#/archive", label: "Archive", icon: ICON_ARCHIVE }
+          : when === "tomorrow"
+            ? { href: "#/", label: "Back to today", icon: ICON_BACK }
+            : { href: "#/archive", label: "Back to archive", icon: ICON_BACK },
+      right: when === "today" ? { href: `#/${addDays(date, 1)}`, label: "Tomorrow", icon: ICON_FORWARD } : undefined,
     }),
     h(
       "section",
@@ -44,6 +48,6 @@ export function DayView({ date, isToday, day, onChange }: Props) {
       onNavigate: next,
     }),
   );
-  if (!isToday) page.append(h("a", { class: "to-today", href: "#/" }, "Back to today →"));
+  if (when === "past") page.append(h("a", { class: "to-today", href: "#/" }, "Back to today →"));
   return page;
 }

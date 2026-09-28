@@ -1,11 +1,11 @@
 import "./style.css";
 import { fit } from "./dom";
-import { isDateKey, localDate } from "./model";
+import { addDays, isDateKey, localDate } from "./model";
 import * as storage from "./storage";
 import { ArchiveView } from "./views/archive";
 import { DayView } from "./views/day";
 
-type Route = { name: "today" } | { name: "archive" } | { name: "day"; date: string };
+type Route = { name: "today" } | { name: "tomorrow" } | { name: "archive" } | { name: "day"; date: string };
 type Transition = "fade" | "wipe";
 
 const app = document.getElementById("app")!;
@@ -14,7 +14,8 @@ let today = localDate();
 function parseRoute(hash: string): Route {
   const path = hash.replace(/^#\/?/, "");
   if (path === "archive") return { name: "archive" };
-  if (isDateKey(path) && path !== today) return { name: "day", date: path };
+  if (isDateKey(path) && path === addDays(today, 1)) return { name: "tomorrow" };
+  if (isDateKey(path) && path < today) return { name: "day", date: path };
   return { name: "today" };
 }
 
@@ -23,11 +24,12 @@ function view(route: Route): HTMLElement {
     case "archive":
       return ArchiveView({ days: storage.pastDays(today) });
     case "today":
+    case "tomorrow":
     case "day": {
-      const date = route.name === "day" ? route.date : today;
+      const date = route.name === "day" ? route.date : route.name === "tomorrow" ? addDays(today, 1) : today;
       return DayView({
         date,
-        isToday: route.name === "today",
+        when: route.name === "day" ? "past" : route.name,
         day: storage.getDay(date),
         onChange: (day) => storage.saveDay(date, day),
       });

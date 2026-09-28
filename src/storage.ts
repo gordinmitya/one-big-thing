@@ -59,9 +59,9 @@ export function saveDay(date: string, day: Day) {
   write(DAYS_KEY, JSON.stringify(days));
 }
 
-export function pastDays(exclude: string): [string, Day][] {
+export function pastDays(today: string): [string, Day][] {
   return Object.keys(days)
-    .filter((d) => d !== exclude)
+    .filter((d) => d < today)
     .sort()
     .reverse()
     .map((d) => [d, getDay(d)]);

@@ -14,6 +14,11 @@ export function localDate(d = new Date()): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 
+export function addDays(date: string, n: number): string {
+  const [y, m, d] = date.split("-").map(Number);
+  return localDate(new Date(y, m - 1, d + n));
+}
+
 export const isDateKey = (s: string): boolean => /^\d{4}-\d{2}-\d{2}$/.test(s);
 
 export function weekday(date: string): string {

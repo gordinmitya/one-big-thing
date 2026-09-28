@@ -16,6 +16,7 @@ type Item = { text: string; done: boolean };
 ```
 
 - days without text are not stored
+- may hold tomorrow (planned ahead); it becomes today at midnight
 - `medium` is always 3 items, may be empty
 - `small` has no empty items
 - legacy: a string item reads as `{ text, done: false }`
