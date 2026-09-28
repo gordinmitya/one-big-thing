@@ -1,4 +1,4 @@
-import { autoFit, fit, h } from "../dom";
+import { h, TextField } from "../dom";
 import type { Item } from "../model";
 import { DoneButton } from "./done";
 
@@ -11,11 +11,8 @@ type Props = {
 };
 
 export function Slot({ kind, hint, item, onChange, onEnter }: Props) {
-  const field = h("textarea", { class: "field", rows: "1", placeholder: " ", spellcheck: "false", "aria-label": hint });
-  field.value = item.text;
-  autoFit(field);
+  const field = TextField(hint, item.text);
   field.addEventListener("input", () => {
-    fit(field);
     item.text = field.value;
     onChange();
   });
@@ -31,7 +28,7 @@ export function Slot({ kind, hint, item, onChange, onEnter }: Props) {
     { class: `slot ${kind}` },
     field,
     h("span", { class: "plus", "aria-hidden": "true" }),
-    h("span", { class: "hint" }, hint),
+    h("span", { class: "hint", "aria-hidden": "true" }, hint),
   );
   slot.append(DoneButton({ item, slot, field, onChange }));
   return slot;

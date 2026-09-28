@@ -21,7 +21,7 @@ export function html(markup: string): Element {
   return t.content.firstElementChild!;
 }
 
-export function fit(t: HTMLTextAreaElement) {
+function fit(t: HTMLTextAreaElement) {
   t.style.height = "auto";
   t.style.height = `${t.scrollHeight}px`;
 }
@@ -35,7 +35,13 @@ const refit = new ResizeObserver((entries) => {
   }
 });
 
-export const autoFit = (t: HTMLTextAreaElement) => refit.observe(t);
+export function TextField(label: string, value: string): HTMLTextAreaElement {
+  const field = h("textarea", { class: "field", rows: "1", placeholder: " ", spellcheck: "false", "aria-label": label });
+  field.value = value;
+  field.addEventListener("input", () => fit(field));
+  refit.observe(field);
+  return field;
+}
 
 export function focusSibling(root: ParentNode, from: Element, delta: number) {
   const fields = [...root.querySelectorAll<HTMLElement>(".field")];

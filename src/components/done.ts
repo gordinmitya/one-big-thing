@@ -15,7 +15,7 @@ function cheer(from: HTMLElement) {
 type Props = {
   item: Item;
   slot: HTMLElement;
-  field: HTMLTextAreaElement | HTMLInputElement;
+  field: HTMLTextAreaElement;
   onChange: () => void;
 };
 

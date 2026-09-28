@@ -40,15 +40,17 @@ export function ArchiveView({ days }: { days: [string, Day][] }) {
     "main",
     { class: "page" },
     header,
-    days.length
-      ? h(
-          "ul",
-          { class: "days" },
-          ...days.map(([date, day]) =>
-            h("li", {}, h("a", { href: `#/${date}` }, h("h3", {}, date, h("small", {}, weekday(date))), Summary(day))),
+    ...(days.length
+      ? [
+          h(
+            "ul",
+            { class: "days" },
+            ...days.map(([date, day]) =>
+              h("li", {}, h("a", { href: `#/${date}` }, h("h3", {}, date, h("small", {}, weekday(date))), Summary(day))),
+            ),
           ),
-        )
-      : h("p", { class: "empty" }, "Nothing here yet. Past days stay here for two weeks."),
-    days.length > 0 && h("p", { class: "note" }, "Days older than two weeks are deleted."),
+          h("p", { class: "note" }, "Days older than two weeks are deleted."),
+        ]
+      : [h("p", { class: "empty" }, "Nothing here yet. Past days stay here for two weeks.")]),
   );
 }

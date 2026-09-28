@@ -2,9 +2,9 @@ import "./style.css";
 import { addDays, isDateKey, localDate } from "./model";
 import * as storage from "./storage";
 import { ArchiveView } from "./views/archive";
-import { DayView } from "./views/day";
+import { DayView, type When } from "./views/day";
 
-type Route = { name: "today" } | { name: "tomorrow" } | { name: "archive" } | { name: "day"; date: string };
+type Route = { name: "archive" } | { name: "day"; date: string; when: When };
 
 const app = document.getElementById("app")!;
 let today = localDate();
@@ -12,27 +12,16 @@ let today = localDate();
 function parseRoute(hash: string): Route {
   const path = hash.replace(/^#\/?/, "");
   if (path === "archive") return { name: "archive" };
-  if (isDateKey(path) && path === addDays(today, 1)) return { name: "tomorrow" };
-  if (isDateKey(path) && path < today) return { name: "day", date: path };
-  return { name: "today" };
+  if (isDateKey(path) && path < today) return { name: "day", date: path, when: "past" };
+  const tomorrow = addDays(today, 1);
+  if (path === tomorrow) return { name: "day", date: tomorrow, when: "tomorrow" };
+  return { name: "day", date: today, when: "today" };
 }
 
 function view(route: Route): HTMLElement {
-  switch (route.name) {
-    case "archive":
-      return ArchiveView({ days: storage.pastDays(today) });
-    case "today":
-    case "tomorrow":
-    case "day": {
-      const date = route.name === "day" ? route.date : route.name === "tomorrow" ? addDays(today, 1) : today;
-      return DayView({
-        date,
-        when: route.name === "day" ? "past" : route.name,
-        day: storage.getDay(date),
-        onChange: (day) => storage.saveDay(date, day),
-      });
-    }
-  }
+  if (route.name === "archive") return ArchiveView({ days: storage.pastDays(today) });
+  const { date, when } = route;
+  return DayView({ date, when, day: storage.getDay(date), onChange: (day) => storage.saveDay(date, day) });
 }
 
 function render(wipe = false) {
@@ -47,7 +36,8 @@ function render(wipe = false) {
 
 function checkNewDay() {
   if (localDate() === today) return;
-  if (parseRoute(location.hash).name === "day") today = localDate();
+  const route = parseRoute(location.hash);
+  if (route.name === "day" && route.when === "past") today = localDate();
   else render(true);
 }
 
@@ -60,21 +50,24 @@ function scheduleMidnight() {
   }, next.getTime() - now.getTime());
 }
 
-const sameRoute = (a: string, b: string) => JSON.stringify(parseRoute(a)) === JSON.stringify(parseRoute(b));
 const stack = [location.hash];
+const previous = () => stack[stack.length - 2];
+const sameRoute = (a?: string, b?: string) =>
+  a !== undefined && b !== undefined && JSON.stringify(parseRoute(a)) === JSON.stringify(parseRoute(b));
 
 window.addEventListener("hashchange", () => {
-  if (stack.length > 1 && sameRoute(location.hash, stack[stack.length - 2])) stack.pop();
+  if (sameRoute(location.hash, previous())) stack.pop();
   else stack.push(location.hash);
   render();
 });
 
 document.addEventListener("click", (e) => {
-  const link = (e.target as Element).closest?.<HTMLAnchorElement>('a[href^="#"]');
-  if (!link || stack.length < 2 || !sameRoute(link.hash || "#/", stack[stack.length - 2])) return;
+  const link = (e.target as Element).closest<HTMLAnchorElement>('a[href^="#"]');
+  if (!link || !sameRoute(link.hash || "#/", previous())) return;
   e.preventDefault();
   history.back();
 });
+
 window.addEventListener("focus", checkNewDay);
 document.addEventListener("visibilitychange", () => document.visibilityState === "visible" && checkNewDay());
 

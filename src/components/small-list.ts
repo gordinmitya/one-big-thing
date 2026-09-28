@@ -1,4 +1,4 @@
-import { autoFit, fit, h } from "../dom";
+import { h, TextField } from "../dom";
 import { type Item, emptyItem } from "../model";
 import { DoneButton } from "./done";
 
@@ -11,12 +11,10 @@ type Props = {
 export function SmallList({ items, onChange, onNavigate }: Props) {
   const list = h("ul", { class: "smalls" });
   const rows = new Map<Element, Item>();
-  const emit = () => onChange([...list.children].map((li) => rows.get(li)!).filter((i) => i.text.trim()));
+  const emit = () => onChange([...list.children].map((li) => rows.get(li)!));
 
   const addRow = (item: Item, animate: boolean) => {
-    const field = h("textarea", { class: "field", rows: "1", placeholder: " ", spellcheck: "false", "aria-label": "Maybe do" });
-    field.value = item.text;
-    autoFit(field);
+    const field = TextField("Maybe do", item.text);
     const li = h(
       "li",
       { class: animate ? "slot small new" : "slot small" },
@@ -35,7 +33,6 @@ export function SmallList({ items, onChange, onNavigate }: Props) {
     };
 
     field.addEventListener("input", () => {
-      fit(field);
       item.text = field.value;
       if (isLast() && field.value) addRow(emptyItem(), true);
       emit();

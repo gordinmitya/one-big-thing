@@ -1,8 +1,8 @@
 import { addDays, type Day, type Item, emptyDay, isEmpty } from "./model";
 
-export const KEEP_DAYS = 14;
-export const DAYS_KEY = "obt.days.v1";
-export const LAST_SEEN_KEY = "obt.lastSeen";
+const KEEP_DAYS = 14;
+const DAYS_KEY = "obt.days.v1";
+const LAST_SEEN_KEY = "obt.lastSeen";
 
 type Obj = Record<string, unknown>;
 const isObj = (v: unknown): v is Obj => typeof v === "object" && v !== null && !Array.isArray(v);
