@@ -11,15 +11,35 @@ function Summary(day: Day) {
   return p;
 }
 
+async function forceUpdate() {
+  await caches?.delete("obt").catch(() => {});
+  await navigator.serviceWorker?.getRegistration().then((r) => r?.update()).catch(() => {});
+  location.reload();
+}
+
+function onTaps(el: HTMLElement, count: number, action: () => void) {
+  let taps: number[] = [];
+  el.addEventListener("click", () => {
+    const now = Date.now();
+    taps = [...taps.filter((t) => now - t < 2000), now];
+    if (taps.length >= count) action();
+  });
+}
+
 export function ArchiveView({ days }: { days: [string, Day][] }) {
+  const header = Header({
+    title: "Archive",
+    subtitle: `${days.length} ${days.length === 1 ? "day" : "days"}`,
+    left: { href: "#/", label: "Back to today", icon: ICON_BACK },
+  });
+  onTaps(header.querySelector(".title")!, 5, () => {
+    header.querySelector(".title small")!.textContent = "Updating…";
+    forceUpdate();
+  });
   return h(
     "main",
     { class: "page" },
-    Header({
-      title: "Archive",
-      subtitle: `${days.length} ${days.length === 1 ? "day" : "days"}`,
-      left: { href: "#/", label: "Back to today", icon: ICON_BACK },
-    }),
+    header,
     days.length
       ? h(
           "ul",

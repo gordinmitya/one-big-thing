@@ -48,6 +48,9 @@ a {
 
 .title {
   text-align: center;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .title h1 {
@@ -213,7 +216,7 @@ h2 {
   border-bottom: 1px solid var(--line);
   text-align: center;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 400;
 }
 
 .smalls {
