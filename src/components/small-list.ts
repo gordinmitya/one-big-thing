@@ -4,12 +4,10 @@ import { DoneButton } from "./done";
 
 type Props = {
   items: Item[];
-  /** Called with the current non-blank items after every edit. */
   onChange: (items: Item[]) => void;
   onNavigate: (from: HTMLElement, delta: 1 | -1) => void;
 };
 
-/** Growing list of small things. There is always one empty row at the end to type into. */
 export function SmallList({ items, onChange, onNavigate }: Props) {
   const list = h("ul", { class: "smalls" });
   const rows = new Map<Element, Item>();

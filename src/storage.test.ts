@@ -1,4 +1,3 @@
-// Pins the STORAGE.md contract. Run with `bun test`.
 import { expect, test } from "bun:test";
 import { parseDay, parseDays } from "./storage";
 

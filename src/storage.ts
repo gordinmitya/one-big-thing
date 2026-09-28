@@ -1,4 +1,3 @@
-/** localStorage persistence. Implements the contract in STORAGE.md; keep them in sync. */
 import { type Day, type Item, emptyDay, isEmpty } from "./model";
 
 export const DAYS_KEY = "obt.days.v1";
@@ -7,14 +6,12 @@ export const LAST_SEEN_KEY = "obt.lastSeen";
 type Obj = Record<string, unknown>;
 const isObj = (v: unknown): v is Obj => typeof v === "object" && v !== null && !Array.isArray(v);
 
-/** Reads an item leniently. Plain strings are the pre-release format. Unknown fields are kept. */
 export function parseItem(v: unknown): Item {
   if (typeof v === "string") return { text: v, done: false };
   if (!isObj(v)) return { text: "", done: false };
   return { ...v, text: typeof v.text === "string" ? v.text : "", done: v.done === true };
 }
 
-/** Reads a day leniently, always returning the full shape. Unknown fields are kept. */
 export function parseDay(v: unknown): Day {
   if (!isObj(v)) return emptyDay();
   const m = Array.isArray(v.medium) ? v.medium : [];
@@ -62,7 +59,6 @@ export function saveDay(date: string, day: Day) {
   write(DAYS_KEY, JSON.stringify(days));
 }
 
-/** Stored days other than `exclude`, newest first. */
 export function pastDays(exclude: string): [string, Day][] {
   return Object.keys(days)
     .filter((d) => d !== exclude)

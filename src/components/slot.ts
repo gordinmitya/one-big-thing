@@ -10,7 +10,6 @@ type Props = {
   onEnter: (from: HTMLElement) => void;
 };
 
-/** A fixed card slot (the big thing or a medium thing): auto-growing text, "+" when empty, Done toggle. */
 export function Slot({ kind, hint, item, onChange, onEnter }: Props) {
   const field = h("textarea", { class: "field", rows: "1", placeholder: " ", spellcheck: "false", "aria-label": hint });
   field.value = item.text;

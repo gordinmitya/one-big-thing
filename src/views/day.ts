@@ -7,12 +7,10 @@ import { type Day, weekday } from "../model";
 type Props = {
   date: string;
   isToday: boolean;
-  /** Owned by this view for its lifetime; edited in place. */
   day: Day;
   onChange: (day: Day) => void;
 };
 
-/** One day, full screen: 1 big, 3 medium, and the small list. Today and past days look the same. */
 export function DayView({ date, isToday, day, onChange }: Props) {
   const save = () => onChange(day);
   const page = h("main", { class: "page" });

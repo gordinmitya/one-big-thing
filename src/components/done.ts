@@ -3,7 +3,6 @@ import type { Item } from "../model";
 
 const CHEERS = ["Done", "Cool", "Nice", "Yes!", "Boom", "👍"];
 
-/** Black bubble that pops over the tapped button, like a stamp. */
 function cheer(from: HTMLElement) {
   const r = from.getBoundingClientRect();
   const pop = h("div", { class: "cheer", "aria-hidden": "true" }, CHEERS[Math.floor(Math.random() * CHEERS.length)]);
@@ -15,13 +14,11 @@ function cheer(from: HTMLElement) {
 
 type Props = {
   item: Item;
-  /** The slot element that gets the `is-done` class. */
   slot: HTMLElement;
   field: HTMLTextAreaElement | HTMLInputElement;
   onChange: () => void;
 };
 
-/** Done / Undo toggle for one item. Mutates `item.done`, then calls onChange. */
 export function DoneButton({ item, slot, field, onChange }: Props) {
   const btn = h("button", { class: "done", type: "button" });
   const sync = () => {

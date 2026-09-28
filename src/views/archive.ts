@@ -2,7 +2,6 @@ import { Header, ICON_BACK } from "../components/header";
 import { h } from "../dom";
 import { type Day, filledItems, weekday } from "../model";
 
-/** A day as one line: "big; medium; small", done items struck through. */
 function Summary(day: Day) {
   const p = h("p");
   filledItems(day).forEach((item, i) => {

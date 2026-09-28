@@ -1,4 +1,3 @@
-/** App shell: routing, new-day rollover, and wiring storage into views. */
 import "./style.css";
 import { fit } from "./dom";
 import { isDateKey, localDate } from "./model";
@@ -46,10 +45,8 @@ function render(transition: Transition = "fade") {
   storage.setLastSeen(today);
 }
 
-/** Re-render when the local date rolls over (midnight, or waking a sleeping tab). */
 function checkNewDay() {
   if (localDate() === today) return;
-  // Today and the archive refresh; an open past day stays put.
   if (parseRoute(location.hash).name === "day") today = localDate();
   else render("wipe");
 }
