@@ -1,5 +1,5 @@
 import "./style.css";
-import { type Day, getDay, items, localDate, pastDates, saveDay } from "./store";
+import { type Day, type Item, emptyItem, getDay, items, localDate, pastDates, saveDay } from "./store";
 
 const app = document.getElementById("app")!;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -53,21 +53,54 @@ function focusSibling(from: HTMLElement, delta: number) {
   if (next) next.focus();
 }
 
+// ---------- Done ----------
+
+const CHEERS = ["Done", "Cool", "Nice", "Yes!", "Boom", "👍"];
+
+/** Black bubble that pops over the tapped button, like a stamp. */
+function celebrate(from: HTMLElement) {
+  const r = from.getBoundingClientRect();
+  const pop = h("div", { class: "cheer", "aria-hidden": "true" }, CHEERS[Math.floor(Math.random() * CHEERS.length)]);
+  pop.style.left = `${r.left + r.width / 2}px`;
+  pop.style.top = `${r.top + r.height / 2}px`;
+  pop.addEventListener("animationend", () => pop.remove());
+  document.body.append(pop);
+}
+
+function doneButton(slot: HTMLElement, field: HTMLTextAreaElement | HTMLInputElement, item: Item, save: () => void) {
+  const btn = h("button", { class: "done", type: "button" });
+  const sync = () => {
+    slot.classList.toggle("is-done", item.done);
+    field.readOnly = item.done;
+    btn.textContent = item.done ? "Undo" : "✓ Done";
+  };
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    item.done = !item.done;
+    sync();
+    if (item.done) celebrate(btn);
+    save();
+  });
+  sync();
+  return btn;
+}
+
 // ---------- Day view ----------
 
 function renderDay(date: string, isToday: boolean): HTMLElement {
   const day: Day = getDay(date);
+  const rowItems = new WeakMap<Element, Item>();
   const save = () => {
-    day.small = [...smalls.querySelectorAll("input")].map((i) => i.value).filter((v) => v.trim());
+    day.small = [...smalls.children].map((li) => rowItems.get(li)!).filter((i) => i.text.trim());
     saveDay(date, day);
   };
 
-  const slot = (cls: string, hint: string, value: string, onInput: (v: string) => void) => {
-    const t = h("textarea", { class: "field", rows: "1", placeholder: " ", spellcheck: "false" });
-    t.value = value;
+  const slot = (cls: string, hint: string, item: Item) => {
+    const t = h("textarea", { class: "field", rows: "1", placeholder: " ", spellcheck: "false", "aria-label": hint });
+    t.value = item.text;
     t.addEventListener("input", () => {
       fit(t);
-      onInput(t.value);
+      item.text = t.value;
       save();
     });
     t.addEventListener("keydown", (e) => {
@@ -76,19 +109,24 @@ function renderDay(date: string, isToday: boolean): HTMLElement {
         focusSibling(t, 1);
       }
     });
-    return h("label", { class: `slot ${cls}` }, t, h("span", { class: "plus", "aria-hidden": "true" }), h("span", { class: "hint" }, hint));
+    const el = h("label", { class: `slot ${cls}` }, t, h("span", { class: "plus", "aria-hidden": "true" }), h("span", { class: "hint" }, hint));
+    el.append(doneButton(el, t, item, save));
+    return el;
   };
 
   const smalls = h("ul", { class: "smalls" });
 
-  const addSmall = (value: string, animate: boolean): HTMLInputElement => {
+  const addSmall = (item: Item, animate: boolean): HTMLInputElement => {
     const input = h("input", { class: "field", placeholder: " ", spellcheck: "false", "aria-label": "Small thing" });
-    input.value = value;
+    input.value = item.text;
     const li = h("li", { class: animate ? "slot small new" : "slot small" }, input, h("span", { class: "plus", "aria-hidden": "true" }));
+    li.append(doneButton(li, input, item, save));
+    rowItems.set(li, item);
     const isLast = () => li === smalls.lastElementChild;
 
     input.addEventListener("input", () => {
-      if (isLast() && input.value) addSmall("", true);
+      item.text = input.value;
+      if (isLast() && input.value) addSmall(emptyItem(), true);
       save();
     });
     input.addEventListener("keydown", (e) => {
@@ -114,7 +152,7 @@ function renderDay(date: string, isToday: boolean): HTMLElement {
   };
 
   for (const s of day.small) addSmall(s, false);
-  addSmall("", false);
+  addSmall(emptyItem(), false);
 
   const page = h(
     "main",
@@ -127,12 +165,8 @@ function renderDay(date: string, isToday: boolean): HTMLElement {
     h(
       "section",
       { class: "card" },
-      slot("big", "One big thing", day.big, (v) => (day.big = v)),
-      h(
-        "div",
-        { class: "mediums" },
-        ...[0, 1, 2].map((i) => slot("medium", "Medium thing", day.medium[i], (v) => (day.medium[i] = v))),
-      ),
+      slot("big", "One big thing", day.big),
+      h("div", { class: "mediums" }, ...day.medium.map((m) => slot("medium", "Medium thing", m))),
     ),
     h("h2", {}, "Other things I might do"),
     smalls,
@@ -151,7 +185,14 @@ function renderArchive(today: string): HTMLElement {
       h(
         "li",
         {},
-        h("a", { href: `#/${date}` }, h("h3", {}, date, h("small", {}, weekday(date))), h("p", {}, items(getDay(date)).join("; "))),
+        h("a", { href: `#/${date}` }, h("h3", {}, date, h("small", {}, weekday(date))), h(
+            "p",
+            {},
+            ...items(getDay(date)).flatMap((it, i) => [
+              ...(i ? ["; "] : []),
+              it.done ? h("s", {}, it.text.trim()) : it.text.trim(),
+            ]),
+          )),
       ),
     );
   }

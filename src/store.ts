@@ -1,12 +1,27 @@
-export type Day = { big: string; medium: [string, string, string]; small: string[] };
+export type Item = { text: string; done: boolean };
+export type Day = { big: Item; medium: [Item, Item, Item]; small: Item[] };
 
 const KEY = "obt.days.v1";
 
 type Days = Record<string, Day>;
 
+/** Accepts both current items and the older plain-string format. */
+const toItem = (v: unknown): Item =>
+  typeof v === "string" ? { text: v, done: false } : { text: String((v as Item)?.text ?? ""), done: !!(v as Item)?.done };
+
+function normalize(d: Partial<Record<keyof Day, unknown>>): Day {
+  const m = Array.isArray(d.medium) ? d.medium : [];
+  return {
+    big: toItem(d.big),
+    medium: [toItem(m[0]), toItem(m[1]), toItem(m[2])],
+    small: (Array.isArray(d.small) ? d.small : []).map(toItem),
+  };
+}
+
 function load(): Days {
   try {
-    return JSON.parse(localStorage.getItem(KEY) ?? "{}") as Days;
+    const raw = JSON.parse(localStorage.getItem(KEY) ?? "{}") as Record<string, object>;
+    return Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, normalize(v)]));
   } catch {
     return {};
   }
@@ -14,21 +29,22 @@ function load(): Days {
 
 const days: Days = load();
 
-export const emptyDay = (): Day => ({ big: "", medium: ["", "", ""], small: [] });
+export const emptyItem = (): Item => ({ text: "", done: false });
 
 export function getDay(date: string): Day {
-  const d = days[date];
-  return d ? { big: d.big, medium: [...d.medium], small: [...d.small] } : emptyDay();
+  return structuredClone(days[date] ?? normalize({}));
 }
 
-export function items(day: Day): string[] {
-  return [day.big, ...day.medium, ...day.small].map((s) => s.trim()).filter(Boolean);
+export function items(day: Day): Item[] {
+  return [day.big, ...day.medium, ...day.small].filter((i) => i.text.trim());
 }
 
 export function saveDay(date: string, day: Day) {
-  if (items(day).length) days[date] = day;
+  if (items(day).length) days[date] = structuredClone(day);
   else delete days[date];
-  localStorage.setItem(KEY, JSON.stringify(days));
+  try {
+    localStorage.setItem(KEY, JSON.stringify(days));
+  } catch {}
 }
 
 /** All stored dates except `exclude`, newest first. */

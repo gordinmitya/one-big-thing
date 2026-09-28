@@ -1,12 +1,16 @@
 :root {
-  --bg: #000;
-  --card: #111;
-  --line: #262626;
-  --text: #f2f2f2;
-  --muted: #6b6b6b;
-  --faint: #3a3a3a;
+  --bg: #eceff2;
+  --card: #fff;
+  --line: #d9dde2;
+  --hover: #e0e4e9;
+  --text: #1c1f23;
+  --soft: #4b525b;
+  --muted: #8a919a;
+  --faint: #c3c9d0;
+  --accent: #3f8fdc;
+  --ink: #16181b;
   --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 * {
@@ -76,7 +80,7 @@ a {
 a.icon:hover,
 a.icon:focus-visible {
   color: var(--text);
-  background: #1a1a1a;
+  background: var(--hover);
   outline: none;
 }
 
@@ -103,7 +107,8 @@ a.icon:focus-visible {
   text-align: center;
   resize: none;
   overflow: hidden;
-  caret-color: var(--text);
+  caret-color: var(--accent);
+  transition: color 0.6s;
 }
 
 /* Thin "+" drawn with two lines, visible while the slot is empty and not focused. */
@@ -175,6 +180,7 @@ a.icon:focus-visible {
   margin-top: 16px;
   background: var(--card);
   border-radius: 4px;
+  box-shadow: 0 1px 2px rgb(20 30 40 / 6%), 0 4px 16px rgb(20 30 40 / 5%);
   overflow: hidden;
 }
 
@@ -182,7 +188,7 @@ a.icon:focus-visible {
   --plus: 56px;
   min-height: 220px;
   padding: 28px 24px 40px;
-  border-bottom: 2px dotted var(--line);
+  border-bottom: 2px dotted color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
 .big .field {
@@ -231,9 +237,98 @@ h2 {
 }
 
 .small .field {
-  padding: 14px 4px;
+  padding: 14px 72px;
   font-size: 16px;
   font-weight: 300;
+}
+
+/* ---------- Done ---------- */
+
+.done {
+  position: absolute;
+  bottom: 8px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, color 0.2s, background 0.2s;
+}
+
+.slot:not(:has(.field:placeholder-shown)) .done {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.done:hover,
+.done:focus-visible {
+  background: var(--hover);
+  outline: none;
+}
+
+.small .done {
+  bottom: auto;
+  top: 50%;
+  right: 0;
+  translate: 0 -50%;
+}
+
+.is-done .field {
+  color: var(--faint);
+}
+
+.is-done .done {
+  color: var(--faint);
+}
+
+.is-done .done:hover,
+.is-done .done:focus-visible {
+  color: var(--muted);
+}
+
+.cheer {
+  position: fixed;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  margin: -36px 0 0 -36px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  pointer-events: none;
+  animation: cheer 1s ease-out forwards;
+}
+
+@keyframes cheer {
+  0% {
+    scale: 0;
+  }
+  22% {
+    scale: 1.12;
+  }
+  34% {
+    scale: 1;
+  }
+  75% {
+    opacity: 1;
+    scale: 1;
+  }
+  100% {
+    opacity: 0;
+    scale: 0.85;
+  }
 }
 
 .small.new {
@@ -292,7 +387,11 @@ h2 {
   font-size: 14px;
   font-weight: 300;
   line-height: 1.45;
-  color: #bdbdbd;
+  color: var(--soft);
+}
+
+.days s {
+  color: var(--muted);
 }
 
 .empty {
@@ -344,5 +443,15 @@ h2 {
   *::after {
     animation: none !important;
     transition: none !important;
+  }
+
+  .cheer {
+    animation: cheer-fade 0.8s forwards !important;
+  }
+
+  @keyframes cheer-fade {
+    to {
+      opacity: 0;
+    }
   }
 }
