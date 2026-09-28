@@ -26,6 +26,17 @@ export function fit(t: HTMLTextAreaElement) {
   t.style.height = `${t.scrollHeight}px`;
 }
 
+const widths = new WeakMap<Element, number>();
+const refit = new ResizeObserver((entries) => {
+  for (const { target, contentRect } of entries) {
+    if (widths.get(target) === contentRect.width) continue;
+    widths.set(target, contentRect.width);
+    fit(target as HTMLTextAreaElement);
+  }
+});
+
+export const autoFit = (t: HTMLTextAreaElement) => refit.observe(t);
+
 export function focusSibling(root: ParentNode, from: Element, delta: number) {
   const fields = [...root.querySelectorAll<HTMLElement>(".field")];
   fields[fields.indexOf(from as HTMLElement) + delta]?.focus();
